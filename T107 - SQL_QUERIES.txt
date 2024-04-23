@@ -1,6 +1,9 @@
-﻿--Q1) User 1 has to favourite the stock 'RELIANCE'
-update favourite set status='TRUE' 
-where stock_symbol='RELIANCE' and user_id='001';
+--Q1) How much quantity of each stock type do the users own
+select p.user_id,s.stock_type,sum(p.quantity_owned) as quantity from stock as s 
+join contains_stock as cs on s.stock_symbol=cs.stock_symbol 
+join portfolio as p on cs.portfolio_id=p.portfolio_id
+group by p.user_id,s.stock_type
+order by user_id asc;
 
 
 --Q2) Give all the stocks User 2 owns
@@ -12,19 +15,22 @@ on c.stock_symbol=s.stock_symbol
 where p.user_id='2';
 
 
---Q3) Give all the commodities user 1 owns
+--Q3) create a view to give the total net worth of the portfolio of all users owns according to commodities
+create view networth as 
+select user_id,portfolio_type,sum(purchased_price*quantity_owned) as net_worth 
+from portfolio  
+group by portfolio_type,user_id 
+order by user_id asc;
+
+select * from networth
+
+--Q4) Give all the commodities user 1 owns
 select p.user_id,c.commodity_name from portfolio as p
 join contains_commodity as s 
 on p.portfolio_id=s.portfolio_id
 join commodity as c
 on c.commodity_name=s.commodity_name
 where p.user_id = '1';
-
-
---Q4) Total net worth of the portfolio user 2 owns according to commodities
-select user_id,portfolio_type,sum(purchased_price*quantity_owned) as net_worth 
-from portfolio where user_id='2' 
-group by user_id,portfolio_type;
 
 
 --Q5)Give the current news for the stock 'State bank of india'
@@ -63,10 +69,9 @@ select * from news where author='Emily Wilson';
 select * from users where EXTRACT(YEAR FROM dob) = '2003'
 
 
---Q14) How many stock types do the users own
-select s.stock_type,p.user_id from stock as s join contains_stock as cs on s.stock_symbol=cs.stock_symbol 
-join portfolio as p on cs.portfolio_id=p.portfolio_id
-group by s.stock_type,p.user_id ;
+--Q14) User 1 has to favourite the stock 'RELIANCE'
+update favourite set status='TRUE' 
+where stock_symbol='RELIANCE' and user_id='001';
 
 
 --Q15) Give the stocks which have their stock_gain_loss above or 30
