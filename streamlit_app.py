@@ -6,11 +6,9 @@ import pandas as pd
 
 mydb = mysql.connector.connect(
     host="localhost",
-    user="root",
-    password="J@sh_2025",
+    user=st.secrets["db_username"],
+    password=st.secrets["db_password"],
     database="portfolio"
-
-
 )
 mycursor=mydb.cursor()
 
@@ -50,8 +48,39 @@ def create_record(table):
             mycursor.execute(sql, val)
             mydb.commit()
             st.success("Record Created Successfully!")
-
-    # Add similar Create forms for other tables
+    elif table == "login":
+        login_id = st.number_input("Login ID", min_value=1, step=1)
+        login_password = st.text_input("Password", type="password")
+        if st.button("Create"):
+            sql = "INSERT INTO login VALUES (%s, %s)"
+            val = (login_id, login_password)
+            mycursor.execute(sql, val)
+            mydb.commit()
+            st.success("Record Created Successfully!")
+    elif table == "stock_indices":
+        index_symbol = st.text_input("Index Symbol")
+        index_name = st.text_input("Index Name")
+        if st.button("Create"):
+            sql = "INSERT INTO stock_indices VALUES (%s, %s)"
+            val = (index_symbol, index_name)
+            mycursor.execute(sql, val)
+            mydb.commit()
+            st.success("Record Created Successfully!")
+    elif table == "stock":
+        stock_symbol = st.text_input("Stock Symbol")
+        stock_name = st.text_input("Stock Name")
+        stock_price = st.number_input("Stock Price", min_value=0)
+        opening_price = st.number_input("Opening Price", min_value=0)
+        closing_price = st.number_input("Closing Price", min_value=0)
+        stock_type = st.text_input("Stock Type")
+        stock_gain_loss = st.number_input("Stock Gain/Loss", min_value=-100000, max_value=100000)
+        index_symbol = st.text_input("Index Symbol")
+        if st.button("Create"):
+            sql = "INSERT INTO stock VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), %s)"
+            val = (stock_symbol, stock_name, stock_price, opening_price, closing_price, stock_type, stock_gain_loss, index_symbol)
+            mycursor.execute(sql, val)
+            mydb.commit()
+            st.success("Record Created Successfully!")
 
 def read_records(table):
     st.subheader(f"Records from {table}")
@@ -73,7 +102,6 @@ def update_record(table):
             mycursor.execute(sql, val)
             mydb.commit()
             st.success("Record Updated Successfully!")
-    # Add similar Update forms for other tables
 
 def delete_record(table):
     st.subheader(f"Delete a Record from {table}")
